@@ -70,8 +70,12 @@
 
   <!-- ══ Host：地點牆（投影用，滿版） ══ -->
   <section class="screen" data-screen="board" hidden>
-    <h2 id="boardTitle">所有地點</h2>
-    <div class="loc-wall" id="boardWall"></div>
+    <div class="timer-bar">
+      <div id="timer" role="timer" aria-live="off">8:00</div>
+      <button class="btn btn-ghost" id="btnPause">暫停</button>
+      <button class="btn btn-ghost" id="btnRestart">重來</button>
+    </div>
+    <div class="board-wall" id="boardWall"></div>
     <p class="hint" id="startsWith"></p>
     <div class="row">
       <button class="btn btn-primary" id="btnNextRound">下一局</button>

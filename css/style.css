@@ -143,13 +143,33 @@ body[data-screen="board"] #app{
 }
 body[data-screen="board"] .screen[data-screen="board"]{min-height:0}
 
-#boardTitle{
-  font-size:clamp(1.4rem,3.6vw,3.4rem);
-  text-align:center;margin-bottom:clamp(8px,1.5vh,20px);
+/* 計時器 */
+.timer-bar{display:flex;align-items:center;justify-content:center;gap:clamp(8px,1.5vw,20px)}
+#timer{
+  font-size:clamp(2rem,6vh,4.5rem);font-weight:800;line-height:1.1;
+  font-variant-numeric:tabular-nums;min-width:5ch;text-align:center;
 }
+.timer-bar .btn{width:auto;margin:0;padding:8px 18px;font-size:clamp(.85rem,1.2vw,1.1rem)}
+.btn:disabled{opacity:.4;cursor:default}
+body.timeup #timer{color:var(--danger);animation:flash .5s ease-in-out 6 alternate}
+body.timeup{animation:flash-bg .5s ease-in-out 6 alternate}
+@keyframes flash{to{opacity:.2}}
+@keyframes flash-bg{to{background:#5b1a24}}
 
-/* 地點牆吃掉所有剩餘高度（Step 6 會換成圖片牆 + 計時器） */
-body[data-screen="board"] #boardWall{flex:1;min-height:0;margin:0;overflow:auto}
+/* 地點圖片牆：欄數與格子大小由 fitBoardWall() 算好，保證不用捲動 */
+.board-wall{
+  flex:1;min-height:0;display:grid;justify-content:center;align-content:center;
+  gap:clamp(4px,.6vw,12px);margin:clamp(8px,1.5vh,20px) 0 0;
+}
+.tile{position:relative;border-radius:8px;overflow:hidden}
+.tile .pic{border-radius:0}
+.tile .pic-emoji{font-size:calc(var(--tile) * .32)}
+.tile-name{
+  position:absolute;left:0;right:0;bottom:0;padding:1.2em 4px 4px;text-align:center;
+  background:linear-gradient(transparent,rgba(0,0,0,.8));
+  font-size:clamp(.7rem,calc(var(--tile) * .1),1.6rem);font-weight:700;line-height:1.2;
+  text-shadow:0 1px 3px #000;
+}
 
 #startsWith{
   font-size:clamp(.9rem,1.8vw,1.8rem);

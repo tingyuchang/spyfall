@@ -36,10 +36,70 @@ const imageOf = (l) => l.image || `images/locations/${l.id}.jpg`;
 const pic = (src, emoji) =>
   `<div class="pic"><span class="pic-emoji">${emoji}</span><img src="${src}" alt="" draggable="false" onerror="this.remove()"></div>`;
 
-function renderWall(container) {
-  container.innerHTML = state.locations
-    .map((l) => `<div class="loc"><span class="loc-emoji">${l.emoji}</span><span class="loc-name">${l.name}</span></div>`)
+/* 投影用圖片牆：名稱疊在圖片下緣，每格固定 4:3，才能精準算出擠得進一個畫面的大小 */
+function renderBoardWall() {
+  $('#boardWall').innerHTML = state.locations
+    .map((l) => `<div class="tile">${pic(imageOf(l), l.emoji)}<span class="tile-name">${l.name}</span></div>`)
     .join('');
+  fitBoardWall();
+}
+
+/* 找「放得下全部、且格子最大」的欄數。欄數越少格子越大，所以由少往多試，第一個放得下的就是答案 */
+function fitBoardWall() {
+  const wall = $('#boardWall');
+  const n = state.locations.length;
+  const gap = parseFloat(getComputedStyle(wall).gap) || 0;
+  const W = wall.clientWidth, H = wall.clientHeight;
+  let cols = n, w = 0;
+  for (let c = 1; c <= n; c++) {
+    w = (W - (c - 1) * gap) / c;
+    const rows = Math.ceil(n / c);
+    if (rows * w * 3 / 4 + (rows - 1) * gap <= H) { cols = c; break; }
+  }
+  wall.style.setProperty('--tile', Math.floor(w) + 'px');
+  wall.style.gridTemplateColumns = `repeat(${cols}, var(--tile))`;
+}
+
+/* ── Host：倒數計時 ─────────────────────────────────── */
+
+const timer = { left: 0, endAt: 0, id: null };
+
+function startTimer() {
+  stopTimer();
+  timer.left = state.config.roundMinutes * 60_000;
+  document.body.classList.remove('timeup');
+  resumeTimer();
+}
+function resumeTimer() {
+  timer.endAt = Date.now() + timer.left;
+  timer.id = setInterval(tickTimer, 250);   // 每次用 Date.now() 重算，不會因為 setInterval 延遲而越跑越慢
+  tickTimer();
+}
+function stopTimer() {
+  clearInterval(timer.id);
+  timer.id = null;
+}
+function togglePause() {
+  if (timer.left <= 0) return;
+  if (timer.id) { stopTimer(); timer.left = timer.endAt - Date.now(); renderTimer(); } else resumeTimer();
+}
+function tickTimer() {
+  if (document.body.dataset.screen !== 'board') return stopTimer();   // 離開投影畫面就停
+  timer.left = Math.max(0, timer.endAt - Date.now());
+  renderTimer();
+  if (timer.left === 0) {
+    stopTimer();
+    document.body.classList.add('timeup');
+    navigator.vibrate?.([400, 150, 400, 150, 400]);
+  }
+}
+function renderTimer() {
+  const sec = Math.ceil(timer.left / 1000);
+  $('#timer').textContent = timer.left === 0
+    ? '時間到！'
+    : `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+  $('#btnPause').textContent = timer.id || timer.left === 0 ? '暫停' : '繼續';
+  $('#btnPause').disabled = timer.left === 0;
 }
 
 /* ── Host：設定畫面 ─────────────────────────────────── */
@@ -97,12 +157,13 @@ function showQR() {
 }
 
 function showBoard() {
-  renderWall($('#boardWall'));
   const n = spyCount();
   $('#startsWith').textContent =
     `由 ${state.round.startSeat} 號玩家先發問。` +
     (n > 1 ? `　本局有 ${n} 個間諜。` : '');
   show('board');
+  renderBoardWall();   // 要在 show 之後，才量得到尺寸
+  startTimer();
 }
 
 /* ── 玩家 ───────────────────────────────────────────── */
@@ -238,6 +299,9 @@ function wireEvents() {
   $('#btnNextRound').onclick = newRound;
   $('#btnStart').onclick     = showBoard;
   $('#btnFullscreen').onclick = toggleFullscreen;
+  $('#btnPause').onclick     = togglePause;
+  $('#btnRestart').onclick   = startTimer;
+  window.addEventListener('resize', () => { if (document.body.dataset.screen === 'board') fitBoardWall(); });
   $('#btnReseat').onclick    = () => {
     try { localStorage.removeItem(seatKey()); } catch { /* ignore */ }
     state.seat = null;
