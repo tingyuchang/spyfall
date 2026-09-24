@@ -120,7 +120,7 @@ hospital     "2" 或 "2,7"  人數     起始玩家    每局亂數  每個座�
 - [x] **Step 6 主持人投影畫面**：地點圖片牆和倒數計時
 - [ ] **Step 7 圖片**：產圖、用 `sips` 轉檔、放進 `images/locations/`
 - [ ] **Step 8 驗證**：用 headless Chrome 截圖（第 7 節），再用真手機掃 QR 走完一局
-- [ ] **Step 9 文件**：`README.md`（玩法、擴充地點的方法）、`CLAUDE.md`（架構決定和 payload 鐵律，比照 chameleon）
+- [x] **Step 9 文件**：`README.md`（玩法、擴充地點的方法）、`CLAUDE.md`（架構決定和 payload 鐵律，比照 chameleon）
 - [ ] **Step 10 部署**：到 GitHub 建 repo，Settings → Pages → `main` 的 `/ (root)`
   （如果要用 `gh`，記得先 `gh auth switch --user tingyuchang`，用完切回去）
 
