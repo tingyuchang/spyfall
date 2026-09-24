@@ -6,32 +6,6 @@
 const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-const randInt = (n) => Math.floor(Math.random() * n);
-
-const b64url = {
-  encode: (s) => btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
-  decode: (s) => atob(s.replace(/-/g, '+').replace(/_/g, '/')),
-};
-
-/* 一局 = 地點 / 間諜座位(可多位，逗號分隔) / 人數 / 起始玩家 / 亂數碼 */
-function encodeRound(r) {
-  return b64url.encode(
-    [r.locationId, r.spySeats.join(','), r.players, r.startSeat, r.nonce].join('|'));
-}
-function decodeRound(hash) {
-  const [locationId, seats, players, startSeat, nonce] = b64url.decode(hash).split('|');
-  const r = {
-    locationId,
-    spySeats: String(seats).split(',').map(Number),
-    players: +players, startSeat: +startSeat, nonce,
-  };
-  const ok = locationId
-    && [r.players, r.startSeat].every(Number.isInteger)
-    && r.spySeats.length > 0 && r.spySeats.every(Number.isInteger);
-  if (!ok) throw new Error('bad payload');
-  return r;
-}
-
 /* ── 狀態 ───────────────────────────────────────────── */
 
 const state = {
@@ -100,6 +74,7 @@ function newRound() {
     startSeat: randInt(players) + 1,
     nonce: Math.random().toString(36).slice(2, 8),
   };
+  state.round.roles = assignRoles(loc.roles.length, players, state.round.spySeats);
   showQR();
 }
 
@@ -162,6 +137,7 @@ function showRole() {
          <div class="seat-tag">${seat} 號玩家</div>
          <div class="emoji">${loc.emoji}</div>
          <div class="title">${loc.name}</div>
+         <div class="job">${loc.roles[round.roles[seat - 1]]}</div>
          <ul>
            <li>問答時證明你知道地點，但<b>別講太明顯</b>，否則間諜就猜到了。</li>
            ${n > 1 ? `<li>本局有 <b>${n} 個</b>間諜，投票時記得。</li>` : ''}
@@ -241,7 +217,8 @@ async function main() {
 
   try {                                   // 有 # → 玩家模式
     state.round = decodeRound(hash);
-    if (!locationById(state.round.locationId)) throw new Error('unknown location');
+    const loc = locationById(state.round.locationId);
+    if (!loc || state.round.roles.some((x) => x >= loc.roles.length)) throw new Error('unknown location/role');
   } catch {
     return show('error');
   }

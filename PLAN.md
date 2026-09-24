@@ -115,7 +115,7 @@ hospital     "2" 或 "2,7"  人數     起始玩家    每局亂數  每個座�
 - [x] **Step 1 建立 repo**：`git init`，放 `.nojekyll`、`.gitignore`（`images/raw/`、`_*.html`），從 chameleon 複製 `js/qrcode.min.js`
 - [x] **Step 2 資料**：把 `IMAGE_PROMPTS.md` 的 30 個地點和職業轉成 `data/locations.json`
 - [x] **Step 3 骨架**：從 chameleon 複製 `index.html`、`app.js`、`style.css`，刪掉 4×4 詞表相關程式，把「變色龍」改成「間諜」
-- [ ] **Step 4 payload**：寫 `encodeRound/decodeRound`，加上 `roles` 欄位，並補上**自我檢查**（見第 7 節）
+- [x] **Step 4 payload**：寫 `encodeRound/decodeRound`，加上 `roles` 欄位，並補上**自我檢查**（見第 7 節）
 - [ ] **Step 5 玩家畫面**：身分卡（地點大圖 + 職業 / 間諜卡）、按住才顯示、地點清單（可點選排除）
 - [ ] **Step 6 主持人投影畫面**：地點圖片牆和倒數計時
 - [ ] **Step 7 圖片**：產圖、用 `sips` 轉檔、放進 `images/locations/`

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<title>payload 自我檢查</title>
+<pre id="out"></pre>
+<script src="js/round.js"></script>
+<script>
+/* 開起來就跑，結果印在頁面和 console。不用測試框架。 */
+const log = [];
+let failed = 0;
+function check(name, cond) {
+  console.assert(cond, name);
+  if (!cond) failed++;
+  log.push((cond ? '✅ ' : '❌ ') + name);
+}
+const throws = (fn) => { try { fn(); return false; } catch { return true; } };
+
+const r = { locationId: 'hospital', spySeats: [3], players: 6, startSeat: 1, nonce: 'k3x9qa',
+            roles: [4, 0, null, 7, 2, 5] };
+
+check('編碼後再解碼，資料一模一樣', JSON.stringify(decodeRound(encodeRound(r))) === JSON.stringify(r));
+check('範例 payload 字串格式', b64url.decode(encodeRound(r)) === 'hospital|3|6|1|k3x9qa|4,0,,7,2,5');
+
+check('單一間諜 "3" 可解析', decodeRound(encodeRound(r)).spySeats.join() === '3');
+const two = { ...r, players: 9, spySeats: [2, 7], roles: [0, null, 1, 2, 3, 4, null, 5, 6] };
+check('兩個間諜 "2,7" 可解析', decodeRound(encodeRound(two)).spySeats.join() === '2,7');
+
+for (let t = 0; t < 50; t++) {                 // 隨機跑幾次，涵蓋各種座位組合
+  const a = assignRoles(8, 9, [2, 7]);
+  if (a[1] !== null || a[6] !== null || a.filter((x) => x === null).length !== 2) {
+    check('間諜座位的職業欄是空的', false); break;
+  }
+  if (t === 49) check('間諜座位的職業欄是空的', true);
+}
+
+const big = assignRoles(8, 12, [5]);            // 11 個平民、8 個職業
+const civ = big.filter((x) => x !== null);
+check('人數 > 職業數時循環重複（11 人用滿 8 種職業）', civ.length === 11 && new Set(civ).size === 8);
+const small = assignRoles(8, 6, [1]).filter((x) => x !== null);
+check('人數 ≤ 職業數時不重複', new Set(small).size === small.length);
+
+check('壞 payload：不是 base64', throws(() => decodeRound('!!!')));
+check('壞 payload：欄位不夠', throws(() => decodeRound(b64url.encode('hospital|3|6'))));
+check('壞 payload：roles 數量對不上人數', throws(() => decodeRound(b64url.encode('hospital|3|6|1|n|4,0,,7'))));
+check('壞 payload：間諜座位有職業', throws(() => decodeRound(b64url.encode('hospital|3|6|1|n|4,0,1,7,2,5'))));
+check('壞 payload：平民座位沒職業', throws(() => decodeRound(b64url.encode('hospital|3|6|1|n|4,,,7,2,5'))));
+check('壞 payload：間諜座位超出人數', throws(() => decodeRound(b64url.encode('hospital|9|6|1|n|4,0,1,7,2,5'))));
+
+log.push('', failed ? `${failed} 項失敗` : '全部通過');
+document.getElementById('out').textContent = log.join('\n');
+document.title = failed ? `FAIL ${failed}` : 'PASS';
+</script>
