@@ -71,11 +71,22 @@ h2{font-size:1.35rem;margin:0 0 4px}
 /* location wall */
 .loc-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin:8px 0 16px}
 .loc{
-  background:var(--card);border:1px solid var(--line);border-radius:10px;
+  background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--fg);font:inherit;
   padding:10px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;
 }
 .loc-emoji{font-size:1.6rem;line-height:1}
 .loc-name{font-size:.85rem;font-weight:600;line-height:1.2}
+button.loc{cursor:pointer}
+.loc[aria-pressed="true"]{opacity:.3;background:transparent}
+.loc[aria-pressed="true"] .loc-name{text-decoration:line-through}
+
+/* 圖片 + emoji 替代：img 蓋在 emoji 上，載入失敗會被移除 */
+.pic{
+  position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;
+  background:var(--card-2);display:flex;align-items:center;justify-content:center;
+}
+.pic-emoji{font-size:clamp(3rem,18vw,6rem);line-height:1}
+.pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
 /* seats */
 /* auto-fit：3 人時是 3 大格，16 人時自動排成 4 欄，不會爆版 */
@@ -88,17 +99,31 @@ h2{font-size:1.35rem;margin:0 0 4px}
 .seat:active{transform:scale(.96)}
 
 /* role card */
+/* 按住才顯示：擋掉 iOS 長按選單、選字、捲動，避免按住時跳出別的東西 */
+.seat-tag{color:var(--muted);font-size:.85rem;letter-spacing:.1em;text-align:center;margin-bottom:8px}
+.reveal{
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none;
+  cursor:pointer;margin-bottom:8px;border-radius:20px;
+}
+.reveal:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.cover{
+  min-height:min(62vh,480px);border:2px dashed var(--line);border-radius:20px;background:var(--card);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+}
+.cover[hidden],.revealed[hidden]{display:none}
+.cover-icon{font-size:3rem;line-height:1;margin-bottom:6px}
+.cover b{font-size:1.3rem}
+.cover span{color:var(--muted);font-size:.9rem}
+
 .role{
-  border-radius:20px;padding:32px 24px;text-align:center;margin-bottom:8px;
+  border-radius:20px;padding:16px 16px 24px;text-align:center;
   border:1px solid var(--line);background:var(--card);
 }
-.role .seat-tag{color:var(--muted);font-size:.85rem;letter-spacing:.1em}
-.role .title{font-size:2rem;font-weight:800;margin:8px 0 0}
+.role .title{font-size:2rem;font-weight:800;margin:12px 0 0;line-height:1.3}
 .role.civilian{border-color:var(--accent);background:linear-gradient(180deg,rgba(74,222,128,.14),transparent 60%)}
 .role.spy{border-color:var(--gold);background:linear-gradient(180deg,rgba(251,191,36,.14),transparent 60%)}
 .role.spy .title{color:var(--gold)}
 .role .job{font-size:1.3rem;font-weight:700;color:var(--accent);margin-top:4px}
-.role .emoji{font-size:4rem;line-height:1;margin:12px 0}
 .role ul{text-align:left;margin:20px 0 0;padding-left:20px;color:var(--muted);font-size:.95rem}
 .role ul li{margin:8px 0}
 .role ul b{color:var(--fg)}

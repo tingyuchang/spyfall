@@ -30,6 +30,12 @@ function show(name) {
 
 /* ── 地點牆 ─────────────────────────────────────────── */
 
+const imageOf = (l) => l.image || `images/locations/${l.id}.jpg`;
+
+/* 圖片蓋在 emoji 上；還沒產圖或載入失敗就把 img 拿掉，露出底下的 emoji */
+const pic = (src, emoji) =>
+  `<div class="pic"><span class="pic-emoji">${emoji}</span><img src="${src}" alt="" draggable="false" onerror="this.remove()"></div>`;
+
 function renderWall(container) {
   container.innerHTML = state.locations
     .map((l) => `<div class="loc"><span class="loc-emoji">${l.emoji}</span><span class="loc-name">${l.name}</span></div>`)
@@ -121,10 +127,9 @@ function showRole() {
   const loc = locationById(round.locationId);
   const n = spyCount();
 
-  $('#roleCard').innerHTML = isSpySeat(seat)
+  const card = isSpySeat(seat)
     ? `<div class="role spy">
-         <div class="seat-tag">${seat} 號玩家</div>
-         <div class="emoji">🕵️</div>
+         ${pic('images/spy.jpg', '🕵️')}
          <div class="title">你是間諜</div>
          <ul>
            <li>你<b>不知道</b>地點在哪裡。</li>
@@ -134,8 +139,7 @@ function showRole() {
          </ul>
        </div>`
     : `<div class="role civilian">
-         <div class="seat-tag">${seat} 號玩家</div>
-         <div class="emoji">${loc.emoji}</div>
+         ${pic(imageOf(loc), loc.emoji)}
          <div class="title">${loc.name}</div>
          <div class="job">${loc.roles[round.roles[seat - 1]]}</div>
          <ul>
@@ -144,7 +148,40 @@ function showRole() {
          </ul>
        </div>`;
 
+  // 預設蓋住，按住才顯示；蓋住時平民和間諜長得一模一樣，連高度都一樣
+  $('#roleCard').innerHTML =
+    `<div class="seat-tag">${seat} 號玩家</div>
+     <div class="reveal" tabindex="0" role="button" aria-label="按住顯示身分">
+       <div class="cover"><div class="cover-icon">🔒</div><b>按住顯示身分</b><span>放開就會蓋回去</span></div>
+       <div class="revealed" hidden>${card}</div>
+     </div>`;
+
   show('role');
+}
+
+function setRevealed(on) {
+  const r = $('#roleCard .reveal');
+  if (!r) return;
+  $('.cover', r).hidden = on;
+  $('.revealed', r).hidden = !on;
+}
+
+/* 地點清單：點一下變灰表示排除，存在本機、跟著這一局 */
+const crossKey = () => 'x:' + state.round.nonce;
+
+function readCrossed() {
+  try { return new Set(JSON.parse(localStorage.getItem(crossKey())) || []); } catch { return new Set(); }
+}
+function writeCrossed(set) {
+  try { localStorage.setItem(crossKey(), JSON.stringify([...set])); } catch { /* 無痕模式：不記就算了 */ }
+}
+
+function renderPlayerWall() {
+  const crossed = readCrossed();
+  $('#playerWall').innerHTML = state.locations
+    .map((l) => `<button class="loc" data-loc="${l.id}" aria-pressed="${crossed.has(l.id)}">
+        <span class="loc-emoji">${l.emoji}</span><span class="loc-name">${l.name}</span></button>`)
+    .join('');
 }
 
 /* ── 事件 ───────────────────────────────────────────── */
@@ -157,7 +194,7 @@ function wireEvents() {
     if (btn.dataset.go) {
       const dest = btn.dataset.go;
       if (dest === 'setup') renderSetup();
-      if (dest === 'locations') renderWall($('#playerWall'));
+      if (dest === 'locations') renderPlayerWall();
       if (dest === 'role') return showRole();
       return show(dest);
     }
@@ -170,6 +207,13 @@ function wireEvents() {
       state.setup.spies = +btn.dataset.spies;
       return renderSetup();
     }
+    if (btn.dataset.loc) {
+      const crossed = readCrossed();
+      const id = btn.dataset.loc;
+      crossed.has(id) ? crossed.delete(id) : crossed.add(id);
+      writeCrossed(crossed);
+      return btn.setAttribute('aria-pressed', crossed.has(id));
+    }
     if (btn.dataset.seat) {
       state.seat = +btn.dataset.seat;
       writeSeat(state.seat);
@@ -177,6 +221,18 @@ function wireEvents() {
     }
   });
 
+  // 按住顯示：放開、手指滑走、切到背景都蓋回去。監聽 window，因為按下後 cover 會被藏起來
+  const onCard = (e) => e.target.closest('#roleCard .reveal');
+  document.addEventListener('pointerdown', (e) => { if (onCard(e)) setRevealed(true); });
+  ['pointerup', 'pointercancel', 'blur'].forEach((t) => window.addEventListener(t, () => setRevealed(false)));
+  document.addEventListener('visibilitychange', () => setRevealed(false));
+  document.addEventListener('contextmenu', (e) => { if (onCard(e)) e.preventDefault(); });   // Android 長按選單
+  document.addEventListener('keydown', (e) => {
+    if (onCard(e) && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); setRevealed(true); }
+  });
+  document.addEventListener('keyup', (e) => { if (onCard(e)) setRevealed(false); });
+
+  $('#btnClearCrossed').onclick = () => { writeCrossed(new Set()); renderPlayerWall(); };
   $('#btnGenerate').onclick  = newRound;
   $('#btnRegen').onclick     = newRound;
   $('#btnNextRound').onclick = newRound;
