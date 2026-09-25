@@ -2,6 +2,8 @@
 
 派對桌遊《Spyfall》的繁體中文網頁版。**純靜態網頁、零後端**，可直接部署在 GitHub Pages。
 
+**線上版：https://tingyuchang.github.io/spyfall/**
+
 ## 怎麼玩
 
 **主持人（一支手機／平板／接投影的筆電）**

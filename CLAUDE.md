@@ -2,6 +2,8 @@
 
 《Spyfall 誰是間諜》繁體中文網頁版。**請用繁體中文跟使用者討論。**
 
+線上版：https://tingyuchang.github.io/spyfall/（repo：`tingyuchang/spyfall`）
+
 架構照搬姊妹專案 `~/git/chameleon`（抓包變色龍），兩邊的慣例保持一致。
 原始執行計劃在 `PLAN.md`。
 

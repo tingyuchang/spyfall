@@ -6,13 +6,13 @@
 
 - [x] Step 1–6：repo、地點資料、骨架、payload + `tests.html`、玩家畫面、投影畫面
 - [x] Step 9：`README.md`、`CLAUDE.md`
-- [ ] Step 10 部署（建議先做：缺圖時會顯示 emoji，不影響遊玩）
+- [x] Step 10 部署：https://tingyuchang.github.io/spyfall/
 - [ ] Step 8 真機驗證（部署後才能用手機掃）
 - [x] Step 7 圖片
 
 ## 換電腦注意
 
-- **這個 repo 還沒有 remote**：先在原電腦完成 Step 10 推上 GitHub，新電腦再 `git clone`；或直接把整個資料夾（含 `.git`）複製過去
+- 新電腦直接 `git clone git@github.com:tingyuchang/spyfall.git`
 - `images/raw/` 不會進 git，原圖要另外搬
 - 新電腦若不是 macOS 就沒有 `sips`，改用 ImageMagick：
   `magick in.png -resize 1024x -quality 75 out.jpg`
@@ -21,12 +21,12 @@
 
 ## Step 10 部署
 
-- [ ] GitHub 建 repo（例如 `tingyuchang/spyfall`）
+- [x] GitHub 建 repo（例如 `tingyuchang/spyfall`）
   - 原電腦用 `gh` 的話先 `gh auth switch --user tingyuchang`，用完切回去
-- [ ] `git remote add origin git@github.com:tingyuchang/spyfall.git && git push -u origin main`
-- [ ] Settings → Pages → Source：`main` 分支 `/ (root)`
-- [ ] 開 `https://tingyuchang.github.io/spyfall/tests.html` 確認全部通過
-- [ ] 把線上網址補進 `README.md` 和 `CLAUDE.md` 開頭
+- [x] `git remote add origin git@github.com:tingyuchang/spyfall.git && git push -u origin main`
+- [x] Settings → Pages → Source：`main` 分支 `/ (root)`
+- [x] 開 `https://tingyuchang.github.io/spyfall/tests.html` 確認全部通過
+- [x] 把線上網址補進 `README.md` 和 `CLAUDE.md` 開頭
 
 ## Step 8 驗證
 
