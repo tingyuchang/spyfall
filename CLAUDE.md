@@ -53,8 +53,10 @@ hospital     "2,7"      人數      起始玩家    每局亂數  每個座位�
 ## 圖片
 
 - 地點圖預設路徑 `images/locations/{id}.jpg`（可用 `image` 欄位覆寫），間諜卡 `images/spy.jpg`，比例 4:3
-- 圖片疊在 emoji 上面，`<img onerror>` 時把 img 移除露出 emoji，所以**缺圖不會壞版**
-- 原圖放 `images/raw/`（gitignore），用 `sips` 縮成寬 1024 的 JPEG，指令在 README
+- 投影牆用縮圖 `images/thumbs/{id}.jpg`（寬 480），身分卡用大圖（寬 1024）。原圖全抓要 5.8MB，投影牆會載很久
+- `pic(src, emoji, fallback)`：載入失敗先換 fallback，再失敗就移除 img 露出 emoji，所以**缺圖不會壞版**（缺縮圖 → 大圖 → emoji）
+- 預載：主持人開首頁就抓全部縮圖；玩家解完 payload 就抓地點圖**和**間諜圖（兩張都抓，不從流量洩漏身分）
+- 原圖放 `images/raw/`（gitignore），用 `sips` 轉大圖和縮圖，指令在 README
 - prompt 在 `IMAGE_PROMPTS.md`；畫面裡刻意不放清楚的人物，避免洩漏或誤導職業
 - 職業不產圖（30 × 8 張成本太高），身分卡用文字
 

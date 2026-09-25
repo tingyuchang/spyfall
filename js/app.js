@@ -31,15 +31,26 @@ function show(name) {
 /* ── 地點牆 ─────────────────────────────────────────── */
 
 const imageOf = (l) => l.image || `images/locations/${l.id}.jpg`;
+const thumbOf = (l) => `images/thumbs/${l.id}.jpg`;   // 投影牆用的小圖（寬 480），沒有就退回原圖
 
-/* 圖片蓋在 emoji 上；還沒產圖或載入失敗就把 img 拿掉，露出底下的 emoji */
-const pic = (src, emoji) =>
-  `<div class="pic"><span class="pic-emoji">${emoji}</span><img src="${src}" alt="" draggable="false" onerror="this.remove()"></div>`;
+/* 圖片蓋在 emoji 上；載入失敗先試 fallback，還是不行就把 img 拿掉，露出底下的 emoji */
+const pic = (src, emoji, fallback = '') =>
+  `<div class="pic"><span class="pic-emoji">${emoji}</span><img src="${src}" data-fallback="${fallback}" alt="" draggable="false" onerror="imgFailed(this)"></div>`;
+
+function imgFailed(img) {
+  const next = img.dataset.fallback;
+  if (!next) return img.remove();
+  img.dataset.fallback = '';
+  img.src = next;
+}
+
+/* 趁主持人設定、玩家選座位的空檔先下載，進到畫面時圖已經在快取裡 */
+const preload = (urls) => urls.forEach((u) => { new Image().src = u; });
 
 /* 投影用圖片牆：名稱疊在圖片下緣，每格固定 4:3，才能精準算出擠得進一個畫面的大小 */
 function renderBoardWall() {
   $('#boardWall').innerHTML = state.locations
-    .map((l) => `<div class="tile">${pic(imageOf(l), l.emoji)}<span class="tile-name">${l.name}</span></div>`)
+    .map((l) => `<div class="tile">${pic(thumbOf(l), l.emoji, imageOf(l))}<span class="tile-name">${l.name}</span></div>`)
     .join('');
   fitBoardWall();
 }
@@ -333,12 +344,16 @@ async function main() {
   }
 
   const hash = location.hash.slice(1);
-  if (!hash) return show('home');        // 沒有 # → 主持人模式
+  if (!hash) {                            // 沒有 # → 主持人模式
+    preload(state.locations.map(thumbOf));
+    return show('home');
+  }
 
   try {                                   // 有 # → 玩家模式
     state.round = decodeRound(hash);
     const loc = locationById(state.round.locationId);
     if (!loc || state.round.roles.some((x) => x >= loc.roles.length)) throw new Error('unknown location/role');
+    preload([imageOf(loc), 'images/spy.jpg']);   // 兩張都抓，旁人從網路流量也看不出身分
   } catch {
     return show('error');
   }

@@ -62,14 +62,20 @@
 prompt 在 `IMAGE_PROMPTS.md`。產好的原圖用 `id` 命名放進 `images/raw/`（不 commit），再用 macOS 內建的 `sips` 縮圖：
 
 ```bash
-mkdir -p images/locations
+mkdir -p images/locations images/thumbs
 for f in images/raw/*.png; do
-  sips -s format jpeg -s formatOptions 75 --resampleWidth 1024 "$f" \
-    --out "images/locations/$(basename "${f%.*}").jpg"
+  id=$(basename "${f%.*}")
+  case $id in
+    spy|hero) sips -s format jpeg -s formatOptions 75 --resampleWidth 1024 "$f" --out "images/$id.jpg" ;;
+    *)        sips -s format jpeg -s formatOptions 75 --resampleWidth 1024 "$f" --out "images/locations/$id.jpg"
+              sips -s format jpeg -s formatOptions 65 --resampleWidth 480  "$f" --out "images/thumbs/$id.jpg" ;;
+  esac
 done
 ```
 
-間諜卡圖是 `images/spy.jpg`，用同樣方式處理。
+- `images/locations/`：身分卡用的大圖（寬 1024）
+- `images/thumbs/`：投影牆用的縮圖（寬 480，30 張約 1.4MB）。沒做縮圖也能用，會自動退回大圖，只是比較慢
+- `images/spy.jpg`：間諜卡；`images/hero.jpg`：首頁主視覺（目前程式沒用到）
 
 ## 本機測試
 
@@ -96,6 +102,7 @@ js/round.js         一局的編碼／解碼、職業分配（純邏輯）
 js/app.js           畫面、計時器、事件
 js/qrcode.min.js    QR 產生器（qrcodejs 1.0.0，已內含）
 data/locations.json 地點、職業、設定
-images/locations/   地點圖片（{id}.jpg）
+images/locations/   地點圖片（{id}.jpg，身分卡用）
+images/thumbs/      地點縮圖（投影牆用）
 IMAGE_PROMPTS.md    產圖用的 prompt
 ```
