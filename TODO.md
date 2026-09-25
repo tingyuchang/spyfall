@@ -8,7 +8,7 @@
 - [x] Step 9：`README.md`、`CLAUDE.md`
 - [ ] Step 10 部署（建議先做：缺圖時會顯示 emoji，不影響遊玩）
 - [ ] Step 8 真機驗證（部署後才能用手機掃）
-- [ ] Step 7 圖片
+- [x] Step 7 圖片
 
 ## 換電腦注意
 
@@ -38,45 +38,45 @@
 - [ ] 選錯座位 →「我選錯號碼了」可以重選
 - [ ] 投影：接筆電／投影機按全螢幕，30 格不用捲動、字看得清楚
 - [ ] 倒數時間到會閃紅
-- [ ] 放圖之後再截一次 1920×1080、1280×720（方法見 `CLAUDE.md`）
+- [x] 放圖之後再截一次 1920×1080、1280×720（方法見 `CLAUDE.md`）
 
 ## Step 7 圖片
 
 prompt 在 `IMAGE_PROMPTS.md`（Kling AI，比例 4:3，負面提示詞用文件開頭那段）。
 產好後用 `id` 命名放進 `images/raw/`，再照 `README.md` 的 `sips` 指令轉成 `images/locations/{id}.jpg`。
 
-- [ ] `airplane` 飛機
-- [ ] `bank` 銀行
-- [ ] `beach` 海灘
-- [ ] `casino` 賭場
-- [ ] `hospital` 醫院
-- [ ] `hotel` 飯店
-- [ ] `military_base` 軍營
-- [ ] `movie_studio` 片場
-- [ ] `pirate_ship` 海盜船
-- [ ] `polar_station` 南極研究站
-- [ ] `police_station` 警察局
-- [ ] `restaurant` 西餐廳
-- [ ] `school` 學校
-- [ ] `space_station` 太空站
-- [ ] `submarine` 潛水艇
-- [ ] `supermarket` 超市
-- [ ] `theater` 劇院
-- [ ] `high_speed_rail` 高鐵
-- [ ] `circus` 馬戲團
-- [ ] `wedding_banquet` 喜宴
-- [ ] `night_market` 夜市
-- [ ] `temple` 廟宇
-- [ ] `convenience_store` 便利商店
-- [ ] `mrt` 捷運車廂
-- [ ] `ktv` KTV
-- [ ] `hot_spring` 溫泉
-- [ ] `gym` 健身房
-- [ ] `zoo` 動物園
-- [ ] `amusement_park` 遊樂園
-- [ ] `department_store` 百貨公司週年慶
-- [ ] `spy` 間諜卡 → 轉成 `images/spy.jpg`（不是放在 `locations/`）
-- [ ] 全部轉完確認 `du -sh images/locations` 約 6MB 以內，commit
+- [x] `airplane` 飛機
+- [x] `bank` 銀行
+- [x] `beach` 海灘
+- [x] `casino` 賭場
+- [x] `hospital` 醫院
+- [x] `hotel` 飯店
+- [x] `military_base` 軍營
+- [x] `movie_studio` 片場
+- [x] `pirate_ship` 海盜船
+- [x] `polar_station` 南極研究站
+- [x] `police_station` 警察局
+- [x] `restaurant` 西餐廳
+- [x] `school` 學校
+- [x] `space_station` 太空站
+- [x] `submarine` 潛水艇
+- [x] `supermarket` 超市
+- [x] `theater` 劇院
+- [x] `high_speed_rail` 高鐵
+- [x] `circus` 馬戲團
+- [x] `wedding_banquet` 喜宴
+- [x] `night_market` 夜市
+- [x] `temple` 廟宇
+- [x] `convenience_store` 便利商店
+- [x] `mrt` 捷運車廂
+- [x] `ktv` KTV
+- [x] `hot_spring` 溫泉
+- [x] `gym` 健身房
+- [x] `zoo` 動物園
+- [x] `amusement_park` 遊樂園
+- [x] `department_store` 百貨公司週年慶
+- [x] `spy` 間諜卡 → 轉成 `images/spy.jpg`（不是放在 `locations/`）
+- [x] 全部轉完確認 `du -sh images/locations` 約 6MB 以內，commit
 
 ## 之後可以考慮（不急）
 
